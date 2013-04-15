@@ -1,0 +1,16 @@
+d4ad1588343d3e04a844f0a0fa7ae77b *DESCRIPTION
+242eb566f870abaf1256b867c790ab88 *NAMESPACE
+f3659461693d67b43b5b349d09e28b03 *R/causalsens.R
+e745ca896fc4982f68408792bca07a37 *README.md
+4ca4d48d7618cd91a0ad8be704255d55 *data/lalonde.exp.RData
+201909bfb284679d9744d2243787721c *data/lalonde.psid.RData
+2b546151b7a03748eb35b7678bb07bb2 *inst/doc/causalsens.Rnw
+ff88185cb7e4e1515005d2b4b782b457 *inst/doc/causalsens.pdf
+f1c2ee7e9ac54a423d4ce15caf66e967 *man/causalsens.Rd
+bf26459aced17f4b49752fd049848a14 *man/lalonde.exp.Rd
+675fa4f9df61bd4d6ba3643ad146048a *man/lalonde.psid.Rd
+0504792bcc42deab52d469343e431774 *man/one.sided.Rd
+99cb5856f24d803a7520488aa5caefa0 *man/plot.causalsens.Rd
+eb43aa8f505ad587a095877e7090b6f7 *vignettes/causalsens.R
+2b546151b7a03748eb35b7678bb07bb2 *vignettes/causalsens.Rnw
+0baa1f52d007675ee2ec8776f3afb8ec *vignettes/causalsens.bib

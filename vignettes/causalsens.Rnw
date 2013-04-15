@@ -1,0 +1,353 @@
+\documentclass[11pt, article,onesided]{memoir}
+
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}
+\renewcommand{\sfdefault}{lmss}
+\renewcommand{\ttdefault}{lmtt}
+% === graphic packages ===
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+% === bibliography package ===
+\usepackage{natbib}
+% === margin and formatting ===
+\usepackage{setspace}
+\usepackage{fullpage}
+\usepackage{caption}
+% === math packages ===
+\usepackage[reqno]{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb,enumerate}
+\newtheorem{Com} {Comment}
+\newtheorem{prop}{Proposition}
+\newtheorem{thm}{Theorem}
+% === dcolumn package ===
+\usepackage{dcolumn}
+\newcolumntype{.}{D{.}{.}{-1}}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+% === additional packages ===
+\usepackage{url}
+\setcounter{tocdepth}{4}
+\usepackage{tikz}
+\usepackage[toc]{multitoc}
+%\VignetteIndexEntry{causalsens: Sensitivity Analysis for Causal Effects}
+%\VignetteDepends{}
+%\VignetteKeyWords{}
+%\VignettePackage{causalsens}
+%\VignetteEngine{knitr}
+
+%% Name, Title, Affiliation, Contact. Change as needed.
+\def\myaffiliation{University of Rochester}
+\def\myauthor{ %
+Matthew Blackwell
+}
+\def\mylongauthor{
+Matthew Blackwell\thanks{Department of Political Science,
+    University of Rochester. web:
+    \mbox{\url{http://www.mattblackwell.org}} email: \mbox{\texttt{\href{mailto:m.blackwell@rochester.edu}{m.blackwell@rochester.edu}}}}
+}
+\def\mytitle{causalsens: Sensitivity Analysis for Causal Effects}
+\def\mykeywords{Matthew Blackwell, Political Science}
+
+
+\usepackage{color}
+\definecolor{gray}{rgb}{0.459,0.438,0.471}
+\definecolor{spot}{rgb}{0.6,0,0}
+\usepackage[pdftex,
+            plainpages=false,
+            pdfpagelabels,
+            bookmarksnumbered,
+            pdftitle={\mytitle},
+            pdfauthor={\myauthor},
+            pdfkeywords={\mykeywords},
+            colorlinks=true,
+            citecolor=spot,
+            linkcolor=spot,
+            urlcolor=spot
+            ]{hyperref}
+
+
+\makeatletter
+\newcommand\org@hypertarget{}
+\let\org@hypertarget\hypertarget
+\renewcommand\hypertarget[2]{%
+\Hy@raisedlink{\org@hypertarget{#1}{}}#2%
+} \makeatother
+
+\newcommand{\obs}{{\text{obs}}}
+\newcommand{\mis}{{\text{mis}}}
+%\newcommand{\Amelia}{\texttt{Amelia}}
+%\renewcommand{\R}{\textsf{R}}
+%% causal inference
+\newcommand{\ate}{\textsc{ate}}
+\newcommand{\att}{\textsc{att}}
+\newcommand{\indep}{\perp\!\!\!\perp}
+\newcommand{\inprob}{\stackrel{p}{\rightarrow}}
+
+
+
+\newcommand{\adjparbox}[2]{\parbox{#1}{\vspace{.35em}#2\vspace{.35em}}}
+
+\counterwithout{section}{chapter}
+
+    % Title flush left
+    \pretitle{\begin{flushleft}\LARGE}
+    \posttitle{\end{flushleft}\par\vskip 0.5em}
+    \preauthor{\begin{flushleft}\sffamily  \Large \vspace{0.25em}}
+    \postauthor{\end{flushleft}}
+    \predate{\begin{flushleft}\sffamily \small\vspace{0.9em}}
+    \postdate{\end{flushleft}\par\vskip 1.5em}
+
+
+\title{\mytitle}
+
+\author{\mylongauthor}
+%% \usepackage{listings}
+%% \lstset{breaklines=true,basicstyle=\footnotesize\ttfamily}
+\begin{document}
+<<setup, include=FALSE, cache=FALSE>>=
+# set global chunk options
+library(knitr)
+opts_chunk$set(fig.path='figure/minimal-', fig.align='center', fig.show='hold',dev='pdf', dev.args=list(family="Palatino"))
+options(replace.assign=TRUE,width=90)
+#render_listings()
+@
+
+
+\maketitle
+%% \tableofcontents
+%% \newpage
+
+
+
+\section{Introduction}
+\label{sec:intro}
+
+The cornerstone of causal inference are assumptions about the
+comparability of groups. Our goal, either by randomization or
+conditioning, is to find groups of observations that are similar on
+all variables except the variable of interest. And while most studies
+simply assert this comparability, careful investigations of causal
+effects want to understand how deviations from this assumption will
+affect their results. This package provides a way for scholars to
+assess violation of a key causal assumption, ignorability, by
+implementing the sensitivity analysis methods proposed in \citet{Blackwell13b}.
+
+\section{A Selection Bias Approach to Sensitivity Analysis }
+\label{sec:method}
+
+\citet{Blackwell13b} introduced an approach to sensitivity analysis
+for causal effects that directly models confounding or selection
+bias. To review, the goal of causal inference is to estimate the
+effect of a treatment, \(A_i\) on an outcome \(Y_i\). In this case, we
+will assume a binary treatment, where we call units with \(A_i = 1\)
+the treated group and the units with \(A_i = 0\) the control group. We
+can write causal effects in terms of \emph{potential outcomes} with
+\(Y_i(1)\) being the outcome value that unit \(i\) would take if they
+were treated and \(Y_i(0)\) being the outcome value under control. A
+consistency assumptions connects these potential outcomes to observed
+outcomes:
+\begin{equation}
+Y_i = Y_i(a) \quad \textrm{if } A_i = a.
+\end{equation}
+
+
+With these definitions in hand, we can define causal effects at the
+individual level:
+\begin{equation}
+\tau_i = Y_i(1) - Y_i(0).
+\end{equation}
+Unfortunately, we cannot identify or estimate these individual effects
+without strong assumptions. A ore estimable quantity is the average of
+these individual effects, called the average treatment effect (\att):
+\begin{equation}
+\tau = E[Y_i(1) - Y_i(0)],
+\end{equation}
+where the expectation is over units. In some cases, the average effect
+among the treated group is a more interesting quantity. We can define
+this parameter as:
+\begin{equation}
+\tau_{\att} = E[Y_i(1)-Y_i(0)|A_i=1].
+\end{equation}
+
+In order to obtain estimates of these quantities, we require
+assumptions that can ensure the comparability of the treatment and
+control groups. Intuitively, we need this comparability because we
+need to use the control group to estimate a counterfactual: how the
+treated would have responded to control? One major approach is to find
+a set of covariates that ensure the groups are comparable. This is
+usually called an \emph{ignorability} assumption and can be stated as
+\begin{equation}
+Y_i(a) \indep A_i | X_i,
+\end{equation}
+for all values of the treatment, \(a\). Here, \(B \indep C | D\)
+indicates that the random variables \(B\) and \(C\) are independent,
+conditional on a set of variables, \(D\). This assumptions states that
+the treated and control groups have similar values of the potential
+outcomes, conditional on a set of covariates. Of course these groups
+will differ on the observed outcomes if there is a causal effect. But
+this assumption allows us to use, say, the control group as a proxy
+for a counterfactual of the treated group. It would be violated if
+there were unmeasured variable that affected both the treatment
+variable and the control variable. The goal of an analyst is to
+collect as much data as possible to make this assumption as plausible
+as possible.
+
+Of course, with explicit randomization, this ignorability assumption
+is obviously suspect. In order to quantify the uncertainty over
+violations of this assumption, \citet{Blackwell13b} describes the
+\emph{confounding function}. This function describes specific
+violations of ignorability. We write this function as
+\begin{equation}
+q(a,x) = E[Y_i(a) | A_i = a, X_i = x] - E[Y_i(a) | A_i = 1-a, X_i = x].
+\end{equation}
+Here, \(q\) describes how the group with \(A_i = a\) differs in their
+potential outcomes from the group with \(A_i = 1-a\) for some value of
+the covariates. Thus, it captures how the comparability between
+treatment groups breaks down. If $q = 0$ for all levels of the
+covariates, then we have ignorability because there is no difference
+between treatment and control groups in terms of their potential
+outcomes.
+
+There a number of choices of the confounding function that
+represent different choices over the type of selection bias. One,
+which \citet{Blackwell13b} calls \emph{one-sided bias}, writes
+the confounding function as a function of a single parameter:
+\begin{equation}
+q(a,x; \alpha) = \alpha(2a - 1).
+\end{equation}
+Here, when \(\alpha > 0\) the potential outcomes for the treated group are
+higher on average than the potential outcomes for the control
+group. In the context of a job training program, this might be because
+the treated group is more motivated and has greater ability than those
+who do not apply for the job training program. An alternative
+parameterization of the confounding function allows for
+\emph{alignment bias}:
+\begin{equation}
+q(a,x; \alpha) = \alpha.
+\end{equation}
+Here, when \(\alpha > 0\), the observed values of the potential outcomes
+are higher than they would be if the treatment allocation was
+reversed. This might be because the treatment effect varies over the
+population and the treatment was targeted to those people for whom the
+treatment is the most effective. The choice of which confounding
+function to use depends on the most plausible violations of
+ignorability. Each confounding functions tests violations of
+ignorability specific to that function, but not others. Thus,
+researchers and critics both have important roles to play in designing
+sensitivity analyses.
+
+With a confounding function in hand, we can see how the estimated
+effects changes as we vary the strength of confounding as summarized
+by the \(\alpha\) values above. As \citet{BruHerHan04} explains, we can
+reapply the same outcome model we used to estimate the original effect
+on a confounding-adjusted outcome:
+\begin{equation}
+  \label{eq:yadj}
+  Y^{q}_i = Y_i  - q(A_i, X_i)\Pr[1-A_i|X_i].
+\end{equation}
+Here, we are essentially subtracting off the bias due to
+confounding that is implied by the confounding function. Note that
+this also requires an estimate of the propensity score, or the
+probability of treatment, conditional on the covariates. Once we have
+this adjusted outcome, we can rerun our original outcome model on this
+adjusted outcome to get an estimate of the causal effect under this
+assumption about confounding. Clearly, when \(q = 0\), this will
+recover the effect estimated under ignorability.
+
+
+\section{An Illustration}
+\label{sec:lalonde}
+
+An illustration is helpful to see how this selection bias approach to
+sensitivity analysis works.  The data in this case come from a job training program
+first studied in \citet{LaLonde86}, which has a long history in the
+causal inference literature on matching estimators. The data comes
+from the National Supported Work program, which instituted a
+randomized experiment to evaluate the effectiveness of a job training
+program. The \texttt{lalonde.exp} dataset in the \texttt{causalsens}
+package is the 445 experimental units with complete data on their
+pre-treatment income. To begin, we load the package and the data:
+
+<<loaddata, include=TRUE, cache=FALSE, tidy=FALSE>>=
+library(causalsens)
+data(lalonde.exp)
+@
+
+To begin, we fit a regression model to this data, with the outcome of
+interest, earnings in 1978 (\texttt{re78}), as a function of
+participating in the program (\texttt{treat}) and various
+pre-treatment covariates.
+<<outcomemodel, tidy=FALSE>>=
+ymodel <- lm(re78 ~ treat+age + education + black + hispanic + married +
+             nodegree + re74 + re75 + u74 + u75, data = lalonde.exp)
+summary(ymodel)
+@
+
+From this, we get an estimate of the treatment effect, which is the
+coefficient on \texttt{treat}. Of course, this effect requires an
+ignorability assumption, so that conditional on the covariates, the
+treated and control groups are comparable. In this case, the data is
+experimental in this case so this assumption is very plausible. But we
+still may want to check out violations of this assumption might affect
+our results. To do this, we then need a model for the relationship
+between the treatment variable and the covariates. This is often
+called the propensity score model because we use predicted values from
+this model as estimates of the propensity score. In general, this will
+be a generalized linear model (GLM) of some sort.
+
+<<pscoremodel, tidy=FALSE>>=
+pmodel <- glm(treat ~ age + education + black + hispanic + married +
+              nodegree + re74 + re75 + u74 + u75, data = lalonde.exp,
+              family = binomial())
+summary(pmodel)
+@
+
+With these two models in hand, we can run the sensitivity analysis by
+passing these two models to the \texttt{causalsens} function, which will
+estimate the effect of treatment under a number of different
+assumptions about the direction and magnitude of unmeasured
+confounding. We also have to choose a confounding function. Here we
+use the one-sided confounding function, focused on the \att
+parameter. \texttt{causalsens} provides a number of confounding
+functions, including the one-sided and alignment bias functions above,
+but users can specify their own confounding function as well. We also
+generate a sequence of values for \(\alpha\) to determine the range of
+possible magnitude of ignorability violations. 
+
+<<causalsens, tidy=FALSE>>=
+alpha <- seq(-4500, 4500, by = 250)
+ll.sens <- causalsens(ymodel, pmodel, ~ age + education, data = lalonde.exp,
+                      alpha = alpha, confound = one.sided.att)
+@
+
+Once we have run the sensitivity analysis, we can plot the results to
+get a sense of the sensitivity of our estimates, which we plot in
+Figure~\ref{fig:sensplot}. 
+
+<<sensplot,echo=2:3,eval=FALSE>>=
+par(mfrow=c(1,2))
+plot(ll.sens, type = "raw", bty = "n")
+plot(ll.sens, type = "r.squared", bty = "n")
+@
+
+<<sensplot, fig.width=10, fig.height=5, fig.cap="Results from LaLonde (1986)",echo=FALSE>>=
+@
+
+In these plots, we can see the difference between the raw confounding
+in terms of \(\alpha\) and the sensitivity in terms of variance explained
+by confounding. In addition, we can compare the strength of
+confounding against the variance explained by the
+covariates. Obviously, there may be other confounding functions to
+check and other amounts of confounding to investigate, but this
+represents a first pass at analyzes the sensitivity of causal
+estimates in the face of unmeasured confounding. 
+
+
+
+
+\bibliographystyle{apsr}
+\bibsep=0in
+\bibliography{causalsens}
+\end{document}
