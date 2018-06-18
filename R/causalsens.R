@@ -198,7 +198,7 @@ summary.causalsens <- function(object, ...) {
 plot.causalsens <- function(x, type = "r.squared", ...) {
   m <- match.call(expand.dots = TRUE)
   m[[1L]] <- quote(graphics::plot)
-  if (m$type == "r.squared") {
+  if (type == "r.squared") {
     m$x <- sign(x$sens$alpha) * x$sens$rsqs
     if (is.null(m$xlab)) {
       m$xlab <- "Variance explained by confounding"
@@ -258,12 +258,12 @@ alignment <- function(alpha, pscores, treat) {
 ##' @rdname one.sided
 ##' @export
 one.sided.att <- function(alpha, pscores, treat) {
-  adj <- -alpha * pscores * (1 - treat)
+  adj <- -alpha  * (1 - treat)
   return(adj)
 }
 ##' @rdname one.sided
 ##' @export
 alignment.att <- function(alpha, pscores, treat) {
-  adj <- alpha * pscores * (1 - treat)
+  adj <- alpha  * (1 - treat)
   return(adj)
 }

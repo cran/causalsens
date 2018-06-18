@@ -1,6 +1,6 @@
 Package: causalsens
-Version: 0.1.1
-Date: 2015-06-30
+Version: 0.1.2
+Date: 2018-06-18
 Title: Selection Bias Approach to Sensitivity Analysis for Causal
         Effects
 Author: Matthew Blackwell <mblackwell@gov.harvard.edu.edu>
@@ -13,7 +13,7 @@ URL: http://www.mattblackwell.org/software/causalsens/
 VignetteBuilder: knitr
 Suggests: knitr
 Collate: 'causalsens.R'
-Packaged: 2015-06-30 19:48:16 UTC; mblackwell
 NeedsCompilation: no
+Packaged: 2018-06-18 19:11:56 UTC; mblackwell
 Repository: CRAN
-Date/Publication: 2015-07-01 06:11:34
+Date/Publication: 2018-06-18 20:06:37 UTC

@@ -1,13 +1,13 @@
-a2636a02810939b63c8b34e42be316e4 *DESCRIPTION
+747473418413c1c1538ca7ab804c2a6f *DESCRIPTION
 3d36cbf5314b7b08a21154762be20479 *NAMESPACE
-e62ed20f1e05c0df403fcf7144826b16 *R/causalsens.R
+76af823914e96d470e14de81989921c9 *R/causalsens.R
 1a134b67c93bfe1c0d0d6c4a4a0f5a5e *README.md
-3369d5e11ee2aa13b039c201c082b35e *build/vignette.rds
+7d97160105ef198ebb045be6cb4c9ad0 *build/vignette.rds
 4ca4d48d7618cd91a0ad8be704255d55 *data/lalonde.exp.RData
 201909bfb284679d9744d2243787721c *data/lalonde.psid.RData
 941c01eaf00d96e1c5372565f553b1af *inst/doc/causalsens.R
 2b546151b7a03748eb35b7678bb07bb2 *inst/doc/causalsens.Rnw
-cda101a0a44f40f01a88dbb2637bfd83 *inst/doc/causalsens.pdf
+ae5451dac8f24b9f55d984500fcf8c77 *inst/doc/causalsens.pdf
 f1c2ee7e9ac54a423d4ce15caf66e967 *man/causalsens.Rd
 bf26459aced17f4b49752fd049848a14 *man/lalonde.exp.Rd
 675fa4f9df61bd4d6ba3643ad146048a *man/lalonde.psid.Rd
